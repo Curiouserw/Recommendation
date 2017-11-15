@@ -1,4 +1,4 @@
-package Setup;
+package Chenxiang.Bean;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -8,47 +8,45 @@ import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.WritableComparable;
 
-public class IdPreference implements WritableComparable<IdPreference> {
-	private Text id;  //userid   itemid
+public class UserPrefer implements WritableComparable<UserPrefer> {
+	private Text user;
 	private DoubleWritable preference;
-	
-	public IdPreference() {
-		id = new Text();
+	public UserPrefer() {
+		user = new Text();
 		preference = new DoubleWritable();
 	}
-
+	
 	public void write(DataOutput out) throws IOException {
-		out.writeUTF(id.toString());
-		out.writeDouble(preference.get());
+		user.write(out);
+		preference.write(out);
 	}
-
+	
 	public void readFields(DataInput in) throws IOException {
-		id=new Text(in.readUTF());
-		preference=new DoubleWritable(in.readDouble());
-		
+		user.readFields(in);
+		preference.readFields(in);
 	}
-
-	public int compareTo(IdPreference o) {
-		int cmp = id.compareTo(o.id);
+	
+	public int compareTo(UserPrefer o) {
+		int cmp = user.compareTo(o.user);
 		if (cmp != 0) {
 			return cmp;
 		}
 		return preference.compareTo(o.preference);
 	}
-	public Text getId() {
-		return id;
+	public Text getUser() {
+		return user;
 	}
-	public void setId(Text id) {
-		this.id = new Text(id.toString());
+	public void setUser(Text user) {
+		this.user = new Text(user.toString());
+	}
+	
+	public String toString() {
+		return user + ":" + preference;
 	}
 	public DoubleWritable getPreference() {
 		return preference;
 	}
 	public void setPreference(DoubleWritable preference) {
 		this.preference = new DoubleWritable(preference.get());
-	}
-	@Override
-	public String toString() {
-		return id.toString() + ":" + preference.toString();
 	}
 }

@@ -1,4 +1,4 @@
-package Setup;
+package Wyl;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Partitioner;

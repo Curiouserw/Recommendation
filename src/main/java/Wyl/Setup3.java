@@ -1,4 +1,4 @@
-package Setup;
+package Wyl;
 
 import java.io.IOException;
 import org.apache.hadoop.conf.Configuration;
@@ -14,53 +14,53 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
-public class Setup4 extends Configured implements Tool{
+public class Setup3 extends Configured implements Tool{
 	
-	private static class Setup4Mapper extends Mapper<LongWritable, Text,Text, Text>{
+	private static class Setup3Mapper extends Mapper<LongWritable, Text,Text, Text>{
 		Text k=new Text();
 		Text v=new Text();
 		@Override
-		protected void map(LongWritable key, Text value,Context context)throws IOException, InterruptedException {
-			String[] split = value.toString().split(" ");
-			k.set(split[1].trim());
-			v.set(split[0]+":"+Double.parseDouble(split[2].trim()));
-			context.write(k,v);
+		protected void map(LongWritable key, Text value, Context context)throws IOException, InterruptedException {
+			String[] split = value.toString().split("\t");
+			k.set(split[0].trim());
+			v.set(split[1].trim()+":"+Double.parseDouble(split[2].trim()));
+			context.write(k, v);
 		}
 	}
-	private static class Setup4Reducer extends Reducer<Text, Text, Text, Text>{
-		StringBuffer b=new StringBuffer();
+	private static class Setup3Reducer extends Reducer<Text, Text, Text, Text>{
+		StringBuffer c=new StringBuffer();
 		Text v=new Text();
 		@Override
 		protected void reduce(Text key, Iterable<Text> value,Context context)throws IOException, InterruptedException {
-			b.setLength(0);
+			c.setLength(0);
 			for (Text tx : value) {
-				b.append(tx.toString()+", ");
+				c.append(tx.toString()+", ");
 			}
-			b.setLength(b.length()-2);
-			v.set("["+b.toString().trim()+"]");
+			c.setLength(c.length()-2);
+			v.set("["+c.toString().trim()+"]");
 			context.write(key,v);
 		}
 	}
 
 	public int run(String[] args) throws Exception {
 		Configuration conf = getConf();
-		//--------------in=/data/matrix.txt
+		//--------------in=/user/hdfs/Setup2-Result-1/part-r-00000
 		Path in=new Path(conf.get("in"));
-		//--------------out=/user/hdfs/Setup4-Result-1/part-r-00000
+		//--------------out=/user/hdfs/Setup3-Result-1/part-r-00000
 		Path out=new Path(conf.get("out"));
 
 		Job job = Job.getInstance(conf);
 		job.setJarByClass(this.getClass());
-		job.setJobName("Recommendation-Setup4");
+		job.setJobName("Recommendation-Setup3");
 		
 		job.setInputFormatClass(TextInputFormat.class);
 		TextInputFormat.addInputPath(job, in);
 		
-		job.setMapperClass(Setup4Mapper.class);
+		job.setMapperClass(Setup3Mapper.class);
 		job.setMapOutputKeyClass(Text.class);
 		job.setMapOutputValueClass(Text.class);
 		
-		job.setReducerClass(Setup4Reducer.class);
+		job.setReducerClass(Setup3Reducer.class);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Text.class);
 		
@@ -70,7 +70,7 @@ public class Setup4 extends Configured implements Tool{
 		return job.waitForCompletion(true)?0:1;
 	}
 	public static void main(String[] args) throws Exception {
-		System.exit(ToolRunner.run(new Setup4(), args));
+		System.exit(ToolRunner.run(new Setup3(), args));
 	}
 }
 
